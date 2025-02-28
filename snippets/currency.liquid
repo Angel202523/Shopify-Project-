@@ -1,0 +1,49 @@
+<select id="currency-switcher">
+    <option value="USD">USD</option>
+    <option value="EUR">EUR</option>
+</select>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("custom-newsletter-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        let email = document.getElementById("newsletter-email").value;
+        let messageBox = document.getElementById("newsletter-message");
+
+        if (!email || !email.includes("@")) {
+            messageBox.innerText = "Please enter a valid email!";
+            messageBox.style.color = "red";
+            return;
+        }
+
+        let formData = {
+            attributes: {
+                "Subscribed Email": email
+            }
+        };
+
+        fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.attributes && data.attributes["Subscribed Email"]) {
+                messageBox.innerText = "Thank you for subscribing!";
+                messageBox.style.color = "green";
+                document.getElementById("newsletter-email").value = "";
+            } else {
+                throw new Error("Subscription failed.");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            messageBox.innerText = "Something went wrong. Try again!";
+            messageBox.style.color = "red";
+        });
+    });
+});
+</script>
+
